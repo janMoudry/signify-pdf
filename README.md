@@ -13,8 +13,8 @@ npm install --save pdf-sign-down
 ## Usage
 
 ```tsx
-import { Pdf } from 'pdf-sign-down'
-import 'pdf-sign-down/dist/index.css'
+import { Pdf } from 'signify-pdf'
+import 'signify-pdf/dist/index.css'
 import { useState } from 'react'
 
 const App = () => {
@@ -53,30 +53,31 @@ const App = () => {
 export default App
 ```
 
-## Args
+## Props
 
 ```tsx
-
-open: boolean // open modal
-onCLose: () => void // callback to close modal
-file: File // pdf file
-customStyles?:{
-container?: CSSProperties
-button?: CSSProperties
-} // custom styles
-texts?: {
-signDown?: string // default: 'Sign down'
-addSignature?: string // default: 'Add signature'
-reset?: string // default: 'Reset'
-save?: string // default: 'Save'
-close?: string // default: 'Close'
-download?: string // default: 'Download'
+interface PDFProps {
+  open: boolean // Modal visibility state
+  onClose: () => void // Callback to close the modal
+  file: File // PDF file
+  customStyles?: {
+    container?: CSSProperties // Custom styles for the container
+    button?: CSSProperties // Custom styles for the buttons
+  }
+  texts?: {
+    signDown?: string // Text for sign down button (default: 'Sign down')
+    addSignature?: string // Text for add signature button (default: 'Add signature')
+    reset?: string // Text for reset button (default: 'Reset')
+    save?: string // Text for save button (default: 'Save')
+    close?: string // Text for close button (default: 'Close')
+    download?: string // Text for download button (default: 'Download')
+  }
+  customPdfDownloadFunction?: (file: jsPDF) => void // Custom function for PDF download (default: download)
 }
-customPdfDownloadFunction?: (file: jsPDF) => void // default is download but you can send there your own function instead of download
-
 ```
 
 ## License
 
 MIT © [moudryJan](https://github.com/moudryJan)
+
 # signify-pdf
