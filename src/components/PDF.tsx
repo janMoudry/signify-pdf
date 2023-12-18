@@ -233,6 +233,7 @@ const PDF: React.FC<PDFProps> = ({
         onSave={signatureControls.handleSave}
         isOpen={openDrawer}
         code={code}
+        texts={texts}
       />
     </div>
   )

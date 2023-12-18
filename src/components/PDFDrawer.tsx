@@ -18,6 +18,7 @@ interface PDFDrawerProps {
   }
   isOpen: boolean
   code?: string
+  buttonStyles?: React.CSSProperties
 }
 
 const PDFDrawer: React.FC<PDFDrawerProps> = ({
@@ -32,7 +33,8 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
   onReset,
   texts = {},
   isOpen,
-  code
+  code,
+  buttonStyles
 }) => {
   const drawCode = (codeText: string) => {
     try {
@@ -87,18 +89,21 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
       />
       <div className={styles.signatureButtonsContainer}>
         <input
+          style={buttonStyles ?? {}}
           type='button'
           value={texts?.reset ?? 'Reset'}
           className={styles.signatureButton}
           onClick={onReset}
         />
         <input
+          style={buttonStyles ?? {}}
           type='button'
           value={texts?.save ?? 'Save'}
           className={styles.signatureButton}
           onClick={() => onSave(code ? code.length * 4 : undefined)}
         />
         <input
+          style={buttonStyles ?? {}}
           type='button'
           value={texts?.close ?? 'Close'}
           className={styles.signatureButton}
