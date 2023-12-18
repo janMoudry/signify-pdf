@@ -22,6 +22,14 @@ interface PDFProps {
   }
   showControls?: T.Controls
   file: File
+  signWithCode?: boolean
+  code?: string
+  getCurrentPosition?: (pos: { x: number; y: number }) => unknown
+  getFileDimmeension?: (dimension: {
+    w: number
+    h: number
+    scale: number
+  }) => void
   texts?: {
     signDown?: string
     addSignature?: string
@@ -29,6 +37,7 @@ interface PDFProps {
     save?: string
     close?: string
     download?: string
+    placeHolderTooltip?: string
   }
   customPdfDownloadFunction?: (file: jsPDF) => void
 }
@@ -39,6 +48,9 @@ const PDF: React.FC<PDFProps> = ({
   customStyles = {},
   file,
   texts,
+  code,
+  // getCurrentPosition,
+  getFileDimmeension,
   customPdfDownloadFunction
   // showControls = T.Controls
 }) => {
@@ -53,6 +65,7 @@ const PDF: React.FC<PDFProps> = ({
 
   const signatureRef = React.useRef(null)
   const viewerCanvasRef = React.useRef(null)
+  const [placeholderMoved, setPlaceholderMoved] = React.useState(false)
 
   const isMobile = window.innerWidth <= 768
 
@@ -62,6 +75,17 @@ const PDF: React.FC<PDFProps> = ({
     top: '50%',
     left: '50%'
   })
+
+  React.useEffect(() => {
+    if (code) {
+      setPlaceholderStyles((prev) => ({
+        ...prev,
+        width: `${code.length * 4}px`,
+        height: '20px'
+      }))
+    }
+  }, [])
+
   const [showPlaceholder, setShowPlaceholder] = React.useState(false)
   const [isSigned, setIsSigned] = React.useState(false)
 
@@ -107,7 +131,8 @@ const PDF: React.FC<PDFProps> = ({
       widthOfSignatures: parseInt(placeholderStyles.width.replace('px', '')),
       heightOfSignatures: parseInt(placeholderStyles.height.replace('px', ''))
     },
-    isMobile
+    isMobile,
+    setPlaceholderMoved
   )
 
   const handleShowPlaceholder = () => {
@@ -177,6 +202,7 @@ const PDF: React.FC<PDFProps> = ({
           setFileDimensions={setFileDimensions}
           scale={scale}
           canvasRef={viewerCanvasRef}
+          getFileDimmeension={getFileDimmeension}
         />
         {showPlaceholder && (
           <PDFDrawerPlaceholder
@@ -186,6 +212,14 @@ const PDF: React.FC<PDFProps> = ({
           />
         )}
       </div>
+      {!placeholderMoved && showPlaceholder && (
+        <div className={styles.placeholderTooltip}>
+          <h5>
+            {texts?.placeHolderTooltip ??
+              'move to place where you want to sign down'}{' '}
+          </h5>
+        </div>
+      )}
 
       <PDFDrawer
         signatureRef={signatureRef}
@@ -198,6 +232,7 @@ const PDF: React.FC<PDFProps> = ({
         onClose={signatureControls.handleClose}
         onSave={signatureControls.handleSave}
         isOpen={openDrawer}
+        code={code}
       />
     </div>
   )

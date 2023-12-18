@@ -114,6 +114,15 @@
   transition: transform 0.5s ease-in-out;
 }
 
+.placeholderTooltip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  background-color: #fff;
+  padding: 0.5rem;
+}
+
 @media screen and (max-width: 768px) {
   .pdf_controls {
     justify-content: center;

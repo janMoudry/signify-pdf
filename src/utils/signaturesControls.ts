@@ -130,7 +130,7 @@ class SignaturesControls {
     }
   }
 
-  handleSave = () => {
+  handleSave = (widthC?: number) => {
     this.states.setOpen(false)
     this.states.setSigned(true)
 
@@ -146,8 +146,14 @@ class SignaturesControls {
         y: parseInt(this.states.styles.top?.toString().replace('px', '') ?? '0')
       }
 
-      const width = this.states.isMobile ? 50 : 100
-      const height = this.states.isMobile ? 50 : 100
+      const width = !widthC ? (this.states.isMobile ? 50 : 100) : widthC
+      const height = widthC ? 30 : this.states.isMobile ? 50 : 100
+
+      console.log({
+        width,
+        height,
+        widthC
+      })
 
       context.drawImage(
         signature,

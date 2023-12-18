@@ -103,8 +103,6 @@ const handleDownload = async ({
         canvas.height / scaleFactor
       )
 
-      console.log('signature', signature)
-
       if (!signature) return
 
       pdf.addImage(

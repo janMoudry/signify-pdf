@@ -9,7 +9,7 @@ interface PDFDrawerProps {
   handleSignDownMobile: (e: React.TouchEvent<HTMLCanvasElement>) => void
   isSigningDown: boolean
   onClose: () => void
-  onSave: () => void
+  onSave: (width?: number) => void
   onReset: () => void
   texts?: {
     reset?: string
@@ -17,6 +17,7 @@ interface PDFDrawerProps {
     close?: string
   }
   isOpen: boolean
+  code?: string
 }
 
 const PDFDrawer: React.FC<PDFDrawerProps> = ({
@@ -30,8 +31,37 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
   onSave,
   onReset,
   texts = {},
-  isOpen
+  isOpen,
+  code
 }) => {
+  const drawCode = (codeText: string) => {
+    try {
+      const canvas = signatureRef.current
+      if (canvas && codeText) {
+        const context = canvas.getContext('2d')
+
+        canvas.width = codeText.length * 4
+        canvas.height = 30
+
+        if (context) {
+          context.font = '6px monospace' // Example font
+          context.fillStyle = 'black' // Text color
+
+          context.fillText(codeText, 0, 12, 5000)
+        }
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  // useEffect hook to watch for changes in 'code' and draw it on the canvas
+  React.useEffect(() => {
+    if (code && signatureRef) {
+      drawCode(code)
+    }
+  }, [])
+
   return (
     <div
       className={styles.signatureContainer}
@@ -66,7 +96,7 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
           type='button'
           value={texts?.save ?? 'Save'}
           className={styles.signatureButton}
-          onClick={onSave}
+          onClick={() => onSave(code ? code.length * 4 : undefined)}
         />
         <input
           type='button'

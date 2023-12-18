@@ -13,6 +13,7 @@ interface PDFViewerProps {
   >
   scale: number
   canvasRef: React.RefObject<HTMLCanvasElement>
+  getFileDimmeension?: (dim: { w: number; h: number; scale: number }) => void
 }
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
@@ -24,6 +25,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   setFileDimensions,
   scale,
   canvasRef
+  // getFileDimmeension
 }) => {
   const [isFileLoading, setIsFileLoading] = React.useState(false)
 

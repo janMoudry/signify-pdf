@@ -4,10 +4,17 @@ import React from 'react'
 class SignaturesPlaceholder {
   states: States
   isMobile: boolean
+  wasPlaceholderMoved: boolean
+  setPlaceholderMoved: React.Dispatch<React.SetStateAction<boolean>>
 
-  constructor(states: States, isMobile: boolean) {
+  constructor(
+    states: States,
+    isMobile: boolean,
+    setPlaceholderMoved: React.Dispatch<React.SetStateAction<boolean>>
+  ) {
     this.states = states
     this.isMobile = isMobile
+    this.setPlaceholderMoved = setPlaceholderMoved
   }
 
   handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -54,6 +61,8 @@ class SignaturesPlaceholder {
       top: `${y}px`,
       left: `${x}px`
     }))
+
+    this.setPlaceholderMoved(true)
   }
 }
 
