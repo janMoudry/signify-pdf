@@ -68,6 +68,7 @@ const PDF: React.FC<PDFProps> = ({
   const [placeholderMoved, setPlaceholderMoved] = React.useState(false)
 
   const isMobile = window.innerWidth <= 768
+  const isTablet = window.innerWidth <= 1024
 
   const [placeholderStyles, setPlaceholderStyles] = React.useState({
     width: isMobile ? '50px' : '100px',
@@ -90,8 +91,37 @@ const PDF: React.FC<PDFProps> = ({
   const [isSigned, setIsSigned] = React.useState(false)
 
   const getScale = () => {
-    if (isMobile) return 0.66
-    return 1
+    const screenWidth = window.innerWidth
+    const screenHeight = window.innerHeight
+
+    if (isMobile) {
+      // Mobile device handling
+      if (screenWidth < 360) {
+        return 0.5 // Small mobile screens
+      } else if (screenWidth < 768) {
+        return 0.66 // Typical mobile screens
+      } else {
+        return 0.75 // Large mobile screens
+      }
+    } else if (isTablet) {
+      // Tablet device handling
+      if (screenWidth < 1024 || screenHeight < 1024) {
+        return 0.8 // Smaller tablets
+      } else {
+        return 0.9 // Larger tablets
+      }
+    } else {
+      // Desktop handling
+      if (screenWidth <= 1024) {
+        return 0.8 // Smaller desktop screens
+      } else if (screenWidth <= 1440) {
+        return 0.9 // Medium desktop screens
+      } else if (screenWidth <= 1920) {
+        return 1 // Standard desktop screens
+      } else {
+        return 1.1 // Large desktop screens
+      }
+    }
   }
 
   const [scale, setScale] = React.useState(getScale())
@@ -175,6 +205,7 @@ const PDF: React.FC<PDFProps> = ({
           value={texts?.download ?? 'Download'}
           onClick={onDownloadClick}
           className={styles.downloadButton}
+          style={customStyles.button}
         />
       )}
       {!showPlaceholder ? (
@@ -186,13 +217,15 @@ const PDF: React.FC<PDFProps> = ({
           style={customStyles.button}
         />
       ) : (
-        <input
-          type='button'
-          value={texts?.signDown ?? 'Sign down'}
-          className={styles.signDownButton}
-          onClick={handleOpenDrawer}
-          style={customStyles.button}
-        />
+        isSigned && (
+          <input
+            type='button'
+            value={texts?.signDown ?? 'Sign down'}
+            className={styles.signDownButton}
+            onClick={handleOpenDrawer}
+            style={customStyles.button}
+          />
+        )
       )}
       <div style={{ position: 'relative' }}>
         <PDFViewer
@@ -204,7 +237,7 @@ const PDF: React.FC<PDFProps> = ({
           canvasRef={viewerCanvasRef}
           getFileDimmeension={getFileDimmeension}
         />
-        {showPlaceholder && (
+        {showPlaceholder && !isSigned && (
           <PDFDrawerPlaceholder
             onDrop={signaturePlaceholder.handleDrop}
             styles={placeholderStyles}
@@ -234,6 +267,7 @@ const PDF: React.FC<PDFProps> = ({
         isOpen={openDrawer}
         code={code}
         texts={texts}
+        buttonStyles={customStyles.button}
       />
     </div>
   )
