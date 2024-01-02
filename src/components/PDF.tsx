@@ -217,7 +217,7 @@ const PDF: React.FC<PDFProps> = ({
           style={customStyles.button}
         />
       ) : (
-        isSigned && (
+        !isSigned && (
           <input
             type='button'
             value={texts?.signDown ?? 'Sign down'}

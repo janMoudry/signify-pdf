@@ -149,12 +149,6 @@ class SignaturesControls {
       const width = !widthC ? (this.states.isMobile ? 50 : 100) : widthC
       const height = widthC ? 30 : this.states.isMobile ? 50 : 100
 
-      console.log({
-        width,
-        height,
-        widthC
-      })
-
       context.drawImage(
         signature,
         signaturePosition.x,
