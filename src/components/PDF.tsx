@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React from 'react'
+import React, { useEffect } from 'react'
 import CloseIcon from './CloseIcon'
 import styles from '../styles.module.css'
 import PDFViewer from './PDFViewer'
@@ -12,6 +12,7 @@ import PDFDrawerPlaceholder from './PDFDrawerPlaceholder'
 import SignaturesPlaceholder from '../utils/signaturePlaceholder'
 import handleDownload from '../utils/download'
 import jsPDF from 'jspdf'
+import * as pdfjs from 'pdfjs-dist'
 
 interface PDFProps {
   open: boolean
@@ -68,7 +69,6 @@ const PDF: React.FC<PDFProps> = ({
   const [placeholderMoved, setPlaceholderMoved] = React.useState(false)
 
   const isMobile = window.innerWidth <= 768
-  const isTablet = window.innerWidth <= 1024
 
   const [placeholderStyles, setPlaceholderStyles] = React.useState({
     width: isMobile ? '50px' : '100px',
@@ -90,41 +90,34 @@ const PDF: React.FC<PDFProps> = ({
   const [showPlaceholder, setShowPlaceholder] = React.useState(false)
   const [isSigned, setIsSigned] = React.useState(false)
 
-  const getScale = () => {
-    const screenWidth = window.innerWidth
-    const screenHeight = window.innerHeight
+  const getScale = async () => {
+    const referenceNumber = 1
 
-    if (isMobile) {
-      // Mobile device handling
-      if (screenWidth < 360) {
-        return 0.5 // Small mobile screens
-      } else if (screenWidth < 768) {
-        return 0.66 // Typical mobile screens
-      } else {
-        return 0.75 // Large mobile screens
-      }
-    } else if (isTablet) {
-      // Tablet device handling
-      if (screenWidth < 1024 || screenHeight < 1024) {
-        return 0.8 // Smaller tablets
-      } else {
-        return 0.9 // Larger tablets
-      }
-    } else {
-      // Desktop handling
-      if (screenWidth <= 1024) {
-        return 0.8 // Smaller desktop screens
-      } else if (screenWidth <= 1440) {
-        return 0.9 // Medium desktop screens
-      } else if (screenWidth <= 1920) {
-        return 1 // Standard desktop screens
-      } else {
-        return 1.1 // Large desktop screens
-      }
-    }
+    await pdfjs.getDocument(URL.createObjectURL(file)).promise.then((pdf) => {
+      pdf.getPage(currentPage).then((page) => {
+        const viewport = page.getViewport({ scale: referenceNumber })
+
+        const widthF = viewport.width
+        const heightF = viewport.height
+
+        const screenWidth = window.innerWidth
+        const screenHeight = window.innerHeight
+
+        const widthRatio = screenWidth / widthF
+        const heightRatio = screenHeight / heightF
+
+        const ratio = Math.min(widthRatio, heightRatio) * 0.8
+
+        setScale(ratio)
+      })
+    })
   }
 
-  const [scale, setScale] = React.useState(getScale())
+  const [scale, setScale] = React.useState<number>(1)
+
+  useEffect(() => {
+    getScale()
+  }, [file])
 
   if (!open) return null
   if (!file) return null
