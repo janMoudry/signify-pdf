@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from '../styles.module.css'
+import ValidationFunctionClass from '../utils/validationFunctions'
 
 interface PDFDrawerProps {
   signatureRef: React.RefObject<HTMLCanvasElement>
@@ -36,6 +37,8 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
   code,
   buttonStyles
 }) => {
+  const { countTimeStart, countTimeEnd } = new ValidationFunctionClass()
+
   const drawCode = (codeText: string) => {
     try {
       const canvas = signatureRef.current
@@ -57,10 +60,30 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
     }
   }
 
-  // useEffect hook to watch for changes in 'code' and draw it on the canvas
   React.useEffect(() => {
     if (code && signatureRef) {
       drawCode(code)
+    }
+
+    if (signatureRef.current) {
+      signatureRef.current.addEventListener('touchstart', countTimeStart)
+      signatureRef.current.addEventListener('touchend', countTimeEnd)
+      signatureRef.current.addEventListener('mousedown', countTimeStart)
+      signatureRef.current.addEventListener('mouseup', countTimeEnd)
+
+      // listen here my custom listener "time"
+      signatureRef.current.addEventListener('time', (e) => {
+        console.log(e)
+      })
+    }
+
+    return () => {
+      if (signatureRef.current) {
+        signatureRef.current.removeEventListener('touchstart', countTimeStart)
+        signatureRef.current.removeEventListener('touchend', countTimeEnd)
+        signatureRef.current.removeEventListener('mousedown', countTimeStart)
+        signatureRef.current.removeEventListener('mouseup', countTimeEnd)
+      }
     }
   }, [])
 

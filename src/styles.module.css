@@ -123,7 +123,7 @@
   padding: 0.5rem;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 750px) {
   .pdf_controls {
     justify-content: center;
     bottom: 0;
@@ -132,5 +132,11 @@
 
   .signatureCanvas {
     width: 75%;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .signatureCanvas {
+    width: 50%;
   }
 }
