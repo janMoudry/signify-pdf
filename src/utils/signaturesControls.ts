@@ -1,9 +1,10 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable no-unused-vars */
 import React from 'react'
 
 class SignaturesControls {
   states: states
   isSigningDown: boolean
+  setNumberOfPoints: () => void
   vectors: {
     x: number
     y: number
@@ -11,11 +12,16 @@ class SignaturesControls {
 
   canvas: React.RefObject<HTMLCanvasElement>
 
-  constructor(states: states, ref: React.RefObject<HTMLCanvasElement>) {
+  constructor(
+    states: states,
+    ref: React.RefObject<HTMLCanvasElement>,
+    setNumberOfPoints: () => void
+  ) {
     this.states = states
     this.canvas = ref
     this.isSigningDown = false
     this.vectors = []
+    this.setNumberOfPoints = setNumberOfPoints.bind(this)
   }
 
   handleDraw({ x, y }: { x: number; y: number }) {
@@ -23,6 +29,9 @@ class SignaturesControls {
 
     if (this.vectors.length <= lines) {
       this.vectors.push({ x, y })
+
+      this.setNumberOfPoints()
+
       return
     }
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import styles from '../styles.module.css'
-import ValidationFunctionClass from '../utils/validationFunctions'
 
 interface PDFDrawerProps {
   signatureRef: React.RefObject<HTMLCanvasElement>
@@ -20,6 +19,8 @@ interface PDFDrawerProps {
   isOpen: boolean
   code?: string
   buttonStyles?: React.CSSProperties
+  countTimeStart: () => void
+  countTimeEnd: () => void
 }
 
 const PDFDrawer: React.FC<PDFDrawerProps> = ({
@@ -35,10 +36,10 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
   texts = {},
   isOpen,
   code,
-  buttonStyles
+  buttonStyles,
+  countTimeStart,
+  countTimeEnd
 }) => {
-  const { countTimeStart, countTimeEnd } = new ValidationFunctionClass()
-
   const drawCode = (codeText: string) => {
     try {
       const canvas = signatureRef.current

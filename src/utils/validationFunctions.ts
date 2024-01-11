@@ -1,15 +1,29 @@
+// eslint-disable-next-line no-unused-vars
+import React from 'react'
+
 class ValidationFunctionClass {
   speed: number
   time: number
   presure: number
-
   timeStart: number
   timeEnd: number
+  numberOfPoints: number
+  setValidationInfo: React.Dispatch<
+    React.SetStateAction<{
+      speed: number
+      time: number
+      presure: number
+    }>
+  >
 
-  constructor() {
+  constructor({ setValidationInfo }: ValidationFunctionInterface) {
     this.speed = 0
     this.time = 0
     this.presure = 0
+    this.timeStart = 0
+    this.timeEnd = 0
+    this.numberOfPoints = 0
+    this.setValidationInfo = setValidationInfo
   }
 
   setSpeed(speed: number) {
@@ -19,8 +33,27 @@ class ValidationFunctionClass {
   setTime(time: number) {
     this.time = this.time + time
 
-    const event = new CustomEvent('time', { detail: this.time })
-    document.dispatchEvent(event)
+    this.setValidationInfo((prevState) => {
+      return {
+        ...prevState,
+        time: this.time
+      }
+    })
+  }
+
+  setNumberOfPoints() {
+    this.numberOfPoints++
+
+    console.log(this.numberOfPoints)
+    if (!this.setValidationInfo) return
+
+    this.setValidationInfo((prevState) => {
+      return {
+        ...prevState,
+        speed: this.speed,
+        numberOfPoints: this.numberOfPoints
+      }
+    })
   }
 
   setPresure(presure: number) {
@@ -42,6 +75,16 @@ class ValidationFunctionClass {
 
     this.countTime()
   }
+}
+
+interface ValidationFunctionInterface {
+  setValidationInfo: React.Dispatch<
+    React.SetStateAction<{
+      speed: number
+      time: number
+      presure: number
+    }>
+  >
 }
 
 export default ValidationFunctionClass
