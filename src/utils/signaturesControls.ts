@@ -1,10 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
+import ValidationFunctionClass from './validationFunctions'
 
 class SignaturesControls {
   states: states
   isSigningDown: boolean
-  setNumberOfPoints: () => void
+  validationFunctions: ValidationFunctionClass
+  numberOfPoints: number
   vectors: {
     x: number
     y: number
@@ -14,23 +16,24 @@ class SignaturesControls {
 
   constructor(
     states: states,
-    ref: React.RefObject<HTMLCanvasElement>,
-    setNumberOfPoints: () => void
+    ref: React.RefObject<HTMLCanvasElement>
+    // validationFunctionClass: ValidationFunctionClass
   ) {
     this.states = states
     this.canvas = ref
     this.isSigningDown = false
     this.vectors = []
-    this.setNumberOfPoints = setNumberOfPoints.bind(this)
+    // this.validationFunctions = validationFunctionClass
+    this.numberOfPoints = 0
   }
 
   handleDraw({ x, y }: { x: number; y: number }) {
     const lines = 2
+    console.log('handleDraw', this.numberOfPoints)
+    this.numberOfPoints = this.numberOfPoints + 1
 
     if (this.vectors.length <= lines) {
       this.vectors.push({ x, y })
-
-      this.setNumberOfPoints()
 
       return
     }

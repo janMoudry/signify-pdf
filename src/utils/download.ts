@@ -13,6 +13,7 @@ type DownloadTypes = {
   canvasRef: React.RefObject<HTMLCanvasElement>
   scale: number
   customPdfDownloadFunction: null | ((pdf: jsPDF) => void)
+  shouldDownload: boolean
 }
 
 const handleDownload = async ({
@@ -23,6 +24,7 @@ const handleDownload = async ({
   fileDimensions,
   canvasRef,
   scale,
+  shouldDownload,
   customPdfDownloadFunction
 }: DownloadTypes) => {
   if (!signatureRef.current) return
@@ -118,11 +120,11 @@ const handleDownload = async ({
     if (i < allPages.length - 1) pdf.addPage()
   }
 
+  shouldDownload && pdf.save(file.name)
+
   if (customPdfDownloadFunction) {
     customPdfDownloadFunction(pdf)
-    return
   }
-  pdf.save('download.pdf')
 }
 
 export default handleDownload

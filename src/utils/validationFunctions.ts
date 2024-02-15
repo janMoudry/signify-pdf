@@ -41,12 +41,18 @@ class ValidationFunctionClass {
     })
   }
 
-  setNumberOfPoints() {
-    this.numberOfPoints++
+  setNumberOfPoints(numberOfPoints: number) {
+    this.numberOfPoints = this.numberOfPoints + numberOfPoints
 
-    console.log(this.numberOfPoints)
-    if (!this.setValidationInfo) return
+    this.setValidationInfo((prevState) => {
+      return {
+        ...prevState,
+        numberOfPoints: this.numberOfPoints
+      }
+    })
+  }
 
+  setValNumberOfPoints() {
     this.setValidationInfo((prevState) => {
       return {
         ...prevState,
@@ -64,6 +70,7 @@ class ValidationFunctionClass {
     const time = this.timeEnd - this.timeStart
 
     this.setTime(time)
+    this.setValNumberOfPoints()
   }
 
   countTimeStart = () => {

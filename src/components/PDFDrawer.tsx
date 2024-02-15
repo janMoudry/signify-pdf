@@ -19,8 +19,8 @@ interface PDFDrawerProps {
   isOpen: boolean
   code?: string
   buttonStyles?: React.CSSProperties
-  countTimeStart: () => void
-  countTimeEnd: () => void
+  // countTimeStart: () => void
+  // countTimeEnd: () => void
 }
 
 const PDFDrawer: React.FC<PDFDrawerProps> = ({
@@ -36,9 +36,9 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
   texts = {},
   isOpen,
   code,
-  buttonStyles,
-  countTimeStart,
-  countTimeEnd
+  buttonStyles
+  // countTimeStart,
+  // countTimeEnd
 }) => {
   const drawCode = (codeText: string) => {
     try {
@@ -64,29 +64,13 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
   React.useEffect(() => {
     if (code && signatureRef) {
       drawCode(code)
-    }
-
-    if (signatureRef.current) {
-      signatureRef.current.addEventListener('touchstart', countTimeStart)
-      signatureRef.current.addEventListener('touchend', countTimeEnd)
-      signatureRef.current.addEventListener('mousedown', countTimeStart)
-      signatureRef.current.addEventListener('mouseup', countTimeEnd)
-
-      // listen here my custom listener "time"
-      signatureRef.current.addEventListener('time', (e) => {
-        console.log(e)
-      })
-    }
-
-    return () => {
-      if (signatureRef.current) {
-        signatureRef.current.removeEventListener('touchstart', countTimeStart)
-        signatureRef.current.removeEventListener('touchend', countTimeEnd)
-        signatureRef.current.removeEventListener('mousedown', countTimeStart)
-        signatureRef.current.removeEventListener('mouseup', countTimeEnd)
+      if (isOpen) {
+        // setTimeout(() => {
+        onSave(code.length * 4)
+        // }, 1000)
       }
     }
-  }, [])
+  }, [isOpen])
 
   return (
     <div
@@ -105,12 +89,28 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
         onTouchEnd={handleSignDownCaptureStop}
         onTouchMove={isSigningDown ? handleSignDownMobile : () => {}}
         style={{
-          zIndex: 100
+          zIndex: 100,
+          visibility: code ? 'hidden' : 'visible'
         }}
         width='100%'
         height='100%'
         ref={signatureRef}
       />
+      {/* <div
+        style={{
+          zIndex: 100,
+          visibility: code ? 'visible' : 'hidden',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          padding: '10px',
+          backgroundColor: 'white',
+          borderRadius: '5px'
+        }}
+      >
+        {code}
+      </div> */}
       <div className={styles.signatureButtonsContainer}>
         <input
           style={buttonStyles ?? {}}
@@ -124,7 +124,7 @@ const PDFDrawer: React.FC<PDFDrawerProps> = ({
           type='button'
           value={texts?.save ?? 'Save'}
           className={styles.signatureButton}
-          onClick={() => onSave(code ? code.length * 4 : undefined)}
+          onClick={() => onSave()}
         />
         <input
           style={buttonStyles ?? {}}

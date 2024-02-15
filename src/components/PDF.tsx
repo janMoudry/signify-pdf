@@ -13,7 +13,7 @@ import SignaturesPlaceholder from '../utils/signaturePlaceholder'
 import handleDownload from '../utils/download'
 import jsPDF from 'jspdf'
 import * as pdfjs from 'pdfjs-dist'
-import ValidationFunctionClass from '../utils/validationFunctions'
+// import ValidationFunctionClass from '../utils/validationFunctions'
 
 interface PDFProps {
   open: boolean
@@ -47,6 +47,7 @@ interface PDFProps {
     time: number
     presure: number
   }) => void
+  shouldDownload?: boolean
 }
 
 const PDF: React.FC<PDFProps> = ({
@@ -60,7 +61,8 @@ const PDF: React.FC<PDFProps> = ({
   getFileDimmeension,
   customPdfDownloadFunction,
   // showControls = T.Controls
-  getSignatureInfo
+  // getSignatureInfo
+  shouldDownload = true
 }) => {
   const [numberOfPages, setNumberOfPages] = React.useState(0)
   const [currentPage, setCurrentPage] = React.useState(1)
@@ -84,15 +86,17 @@ const PDF: React.FC<PDFProps> = ({
     left: '50%'
   })
 
-  const [validationInfo, setValidationInfo] = React.useState<{
-    speed: number
-    time: number
-    presure: number
-  }>({
-    speed: 0,
-    time: 0,
-    presure: 0
-  })
+  // const [validationInfo, setValidationInfo] = React.useState<{
+  //   speed: number
+  //   time: number
+  //   presure: number
+  //   numberOfPoints: number
+  // }>({
+  //   speed: 0,
+  //   time: 0,
+  //   presure: 0,
+  //   numberOfPoints: 0
+  // })
 
   React.useEffect(() => {
     if (code) {
@@ -149,9 +153,9 @@ const PDF: React.FC<PDFProps> = ({
     isMobile
   })
 
-  const validationFunctions = new ValidationFunctionClass({
-    setValidationInfo
-  })
+  // const validationFunctions = new ValidationFunctionClass({
+  //   setValidationInfo
+  // })
 
   const signatureControls = new SignaturesControls(
     {
@@ -164,8 +168,8 @@ const PDF: React.FC<PDFProps> = ({
       styles: placeholderStyles,
       setSigned: setIsSigned
     },
-    signatureRef,
-    validationFunctions.setNumberOfPoints
+    signatureRef
+    // validationFunctions
   )
   const signaturePlaceholder = new SignaturesPlaceholder(
     {
@@ -197,18 +201,19 @@ const PDF: React.FC<PDFProps> = ({
       fileDimensions,
       canvasRef: viewerCanvasRef,
       scale,
-      customPdfDownloadFunction: customPdfDownloadFunction ?? null
+      customPdfDownloadFunction: customPdfDownloadFunction ?? null,
+      shouldDownload
     })
   }
 
-  useEffect(() => {
-    getSignatureInfo && getSignatureInfo(validationInfo)
-  }, [
-    validationInfo.speed,
-    validationInfo.time,
-    validationInfo.presure,
-    getSignatureInfo
-  ])
+  // useEffect(() => {
+  //   getSignatureInfo && getSignatureInfo(validationInfo)
+  // }, [
+  //   validationInfo.speed,
+  //   validationInfo.time,
+  //   validationInfo.presure,
+  //   getSignatureInfo
+  // ])
 
   return (
     <div className={styles.pdfModal} style={customStyles.container}>
@@ -292,8 +297,8 @@ const PDF: React.FC<PDFProps> = ({
         code={code}
         texts={texts}
         buttonStyles={customStyles.button}
-        countTimeStart={validationFunctions.countTimeStart}
-        countTimeEnd={validationFunctions.countTimeEnd}
+        // countTimeStart={validationFunctions.countTimeStart}
+        // countTimeEnd={validationFunctions.countTimeEnd}
       />
     </div>
   )
