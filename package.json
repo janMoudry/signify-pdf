@@ -1,6 +1,6 @@
 {
   "name": "signify-pdf",
-  "version": "0.0.5-rc.36",
+  "version": "0.0.5-rc.72",
   "description": "Library for signing PDF documents in React",
   "author": "Jan Moudrý",
   "license": "MIT",
@@ -69,6 +69,7 @@
   ],
   "dependencies": {
     "jspdf": "^2.5.1",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^3.10.111"
   },
   "eslintConfig": {

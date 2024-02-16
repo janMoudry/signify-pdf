@@ -29,7 +29,7 @@ class SignaturesControls {
 
   handleDraw({ x, y }: { x: number; y: number }) {
     const lines = 2
-    console.log('handleDraw', this.numberOfPoints)
+    // console.log('handleDraw', this.numberOfPoints)
     this.numberOfPoints = this.numberOfPoints + 1
 
     if (this.vectors.length <= lines) {
