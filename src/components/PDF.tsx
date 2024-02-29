@@ -11,8 +11,8 @@ import SignaturesControls from '../utils/signaturesControls'
 import PDFDrawerPlaceholder from './PDFDrawerPlaceholder'
 import SignaturesPlaceholder from '../utils/signaturePlaceholder'
 import handleDownload from '../utils/download'
-import jsPDF from 'jspdf'
 import * as pdfjs from 'pdfjs-dist'
+import { PDFDocument } from 'pdf-lib'
 // import ValidationFunctionClass from '../utils/validationFunctions'
 
 interface PDFProps {
@@ -40,14 +40,19 @@ interface PDFProps {
     close?: string
     download?: string
     placeHolderTooltip?: string
+    readPdfHelper?: string
+    reded?: string
   }
-  customPdfDownloadFunction?: (file: jsPDF) => void
+  customPdfDownloadFunction?: (file: PDFDocument) => void
   getSignatureInfo?: (info: {
     speed: number
     time: number
     presure: number
   }) => void
   shouldDownload?: boolean
+  readerTimer?: number
+  skipReading?: boolean
+  hideReaderToolbar?: boolean
 }
 
 const PDF: React.FC<PDFProps> = ({
@@ -62,7 +67,10 @@ const PDF: React.FC<PDFProps> = ({
   customPdfDownloadFunction,
   // showControls = T.Controls
   // getSignatureInfo
-  shouldDownload = true
+  shouldDownload = true,
+  readerTimer = 5000,
+  skipReading = false
+  // hideReaderToolbar = false
 }) => {
   const [numberOfPages, setNumberOfPages] = React.useState(0)
   const [currentPage, setCurrentPage] = React.useState(1)
@@ -76,8 +84,10 @@ const PDF: React.FC<PDFProps> = ({
   const signatureRef = React.useRef(null)
   const viewerCanvasRef = React.useRef(null)
   const [placeholderMoved, setPlaceholderMoved] = React.useState(false)
+  const [isPdfReaded, setIsPdfReaded] = React.useState(false)
+  const [unableToSign, setUnableToSign] = React.useState(true)
 
-  const isMobile = window.innerWidth <= 768
+  const isMobile = window.innerWidth <= 1024
 
   const [placeholderStyles, setPlaceholderStyles] = React.useState({
     width: isMobile ? '50px' : '100px',
@@ -89,7 +99,7 @@ const PDF: React.FC<PDFProps> = ({
   // const [validationInfo, setValidationInfo] = React.useState<{
   //   speed: number
   //   time: number
-  //   presure: number
+  //   presur e: number
   //   numberOfPoints: number
   // }>({
   //   speed: 0,
@@ -139,6 +149,44 @@ const PDF: React.FC<PDFProps> = ({
   useEffect(() => {
     getScale()
   }, [file])
+
+  useEffect(() => {
+    if (!skipReading) {
+      const timeout = setTimeout(() => {
+        setUnableToSign(false)
+      }, readerTimer)
+
+      return () => {
+        clearTimeout(timeout)
+      }
+    }
+
+    return () => {}
+  }, [])
+
+  useEffect(() => {
+    if (isMobile) {
+      document.body.style.overflow = 'hidden'
+      document.addEventListener(
+        'touchmove',
+        function (e) {
+          e.preventDefault()
+        },
+        { passive: false }
+      )
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto'
+      document.removeEventListener(
+        'touchmove',
+        function (e) {
+          e.preventDefault()
+        },
+        {}
+      )
+    }
+  }, [])
 
   if (!open) return null
   if (!file) return null
@@ -202,7 +250,8 @@ const PDF: React.FC<PDFProps> = ({
       canvasRef: viewerCanvasRef,
       scale,
       customPdfDownloadFunction: customPdfDownloadFunction ?? null,
-      shouldDownload
+      shouldDownload,
+      code
     })
   }
 
@@ -214,6 +263,75 @@ const PDF: React.FC<PDFProps> = ({
   //   validationInfo.presure,
   //   getSignatureInfo
   // ])
+
+  if (!isPdfReaded && !skipReading) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: '100svh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          left: 0,
+          top: 0
+        }}
+      >
+        {/* <iframe
+          src={URL.createObjectURL(file)}
+          style={{ width: '100%', height: '100vh', border: 'none' }}
+          frameBorder='0'
+        /> */}
+        <embed
+          src={URL.createObjectURL(file)}
+          type='application/pdf'
+          width='100%'
+          height='100%'
+        />
+
+        <div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            padding: '10px',
+            backgroundColor: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            visibility: unableToSign ? 'visible' : 'hidden'
+          }}
+        >
+          <p
+            style={{
+              color: 'black'
+            }}
+          >
+            {texts?.readPdfHelper ??
+              'Please read the document before you can sign it'}
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            setIsPdfReaded(true)
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            padding: '10px',
+            backgroundColor: 'white',
+            border: 'none',
+            borderRadius: '5px'
+          }}
+          disabled={unableToSign}
+        >
+          {texts?.reded ?? 'Readed'}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.pdfModal} style={customStyles.container}>

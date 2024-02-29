@@ -14,6 +14,7 @@ type DownloadTypes = {
   scale: number
   customPdfDownloadFunction: null | ((pdf: any) => void)
   shouldDownload: boolean
+  code?: string
 }
 
 const handleDownload = async (params: DownloadTypes) => {
@@ -32,7 +33,8 @@ const handleDownload = async (params: DownloadTypes) => {
 
     if (!signatureCanvas) return
 
-    const signatureDataUrl = signatureCanvas.toDataURL('image/png')
+    const signatureDataUrl = signatureCanvas.toDataURL('image/svg', 2.0)
+
     const signatureImageBytes = await fetch(signatureDataUrl).then((res) =>
       res.arrayBuffer()
     )
@@ -44,18 +46,37 @@ const handleDownload = async (params: DownloadTypes) => {
     const page = pdfDoc.getPage(params.currentPage - 1) // Adjust for zero-based index
 
     // Position the image on the page (example: bottom-right corner)
-    page.drawImage(signatureImage, {
-      x:
-        parseInt(params.style.left?.toString().replace('px', '') ?? '0', 10) /
-        params.scale,
-      y:
-        page.getHeight() -
-        parseInt(params.style.top?.toString().replace('px', '') ?? '0', 10) /
-          params.scale -
-        50,
-      width: 50,
-      height: 50
-    })
+    if (!params?.code) {
+      page.drawImage(signatureImage, {
+        x:
+          parseInt(params.style.left?.toString().replace('px', '') ?? '0', 10) /
+          params.scale,
+        y:
+          page.getHeight() -
+          parseInt(params.style.top?.toString().replace('px', '') ?? '0', 10) /
+            params.scale -
+          (signatureCanvas?.height / params.scale ?? 50),
+        width: signatureCanvas?.width / params.scale ?? 50,
+        height: signatureCanvas?.height / params.scale ?? 50
+      })
+    }
+    if (params?.code) {
+      page.drawText(params.code, {
+        x:
+          parseInt(params.style.left?.toString().replace('px', '') ?? '0', 10) /
+          params.scale,
+        y:
+          page.getHeight() -
+          parseInt(params.style.top?.toString().replace('px', '') ?? '0', 10) /
+            params.scale,
+        size: 5
+      })
+    }
+
+    if (params.customPdfDownloadFunction)
+      params.customPdfDownloadFunction(pdfDoc)
+
+    if (!params.shouldDownload) return
 
     // Serialize the PDFDocument to bytes and trigger the download
     const pdfBytes = await pdfDoc.save()
